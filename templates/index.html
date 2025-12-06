@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Password Analyzer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>🔐 Smart Password Validator</h1>
+        <p>Discrete Math & Permutations in Cybersecurity</p>
+    </header>
+
+    <div class="main-card">
+        
+        {% if not session.get('data_loaded') %}
+        <form method="POST">
+            <input type="hidden" name="save_data" value="1">
+            <div class="section personal-data">
+                <h3>1. Personal Data Setup</h3>
+                <p class="desc">Enter target's info to generate the permutation blacklist set.</p>
+                
+                <div class="input-grid">
+                    <div class="input-group">
+                        <label>First Name</label>
+                        <input type="text" name="fname" placeholder="e.g. John">
+                    </div>
+                    <div class="input-group">
+                        <label>Last Name</label>
+                        <input type="text" name="lname" placeholder="e.g. Doe">
+                    </div>
+                    <div class="input-group">
+                        <label>Birth Year</label>
+                        <input type="text" name="year" placeholder="e.g. 1995">
+                    </div>
+                    <div class="input-group">
+                        <label>Partner's Name</label>
+                        <input type="text" name="partner" placeholder="e.g. Sarah">
+                    </div>
+                    <div class="input-group">
+                        <label>Pet / Nickname</label>
+                        <input type="text" name="pet" placeholder="e.g. Rocky">
+                    </div>
+                    <div class="input-group">
+                        <label>Phone Segment</label>
+                        <input type="text" name="mobile" placeholder="e.g. 01020">
+                    </div>
+                </div>
+                <button type="submit" class="btn-analyze">Generate Blacklist & Lock 🔒</button>
+            </div>
+        </form>
+        {% endif %}
+
+        {% if session.get('data_loaded') %}
+        <div class="section password-check fade-in">
+            <div class="locked-header">
+                <div>
+                    <h3>2. Analysis Mode</h3>
+                    <p style="color: #666; font-size: 0.9em; margin:0;">Testing against <strong>{{ session.get('user_name') }}'s</strong> data.</p>
+                </div>
+                <span class="badge count">{{ session.get('blacklist_count') }} Permutations Logic</span>
+            </div>
+            
+            <form method="POST">
+                <input type="hidden" name="check_pass" value="1">
+                <div class="input-group">
+                    <label>Test a Password</label>
+                    <input type="password" name="password" required placeholder="Enter password to test..." autofocus>
+                </div>
+                <button type="submit" class="btn-analyze">Analyze Strength 🚀</button>
+            </form>
+
+            <form method="POST" style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #ffffff10;">
+                <input type="hidden" name="reset_action" value="1">
+                <button type="submit" class="btn-reset">🔄 Reset / New Target User</button>
+            </form>
+        </div>
+        {% endif %}
+
+        {% if result %}
+        <div class="results-area fade-in">
+            <div class="alert alert-{{ result.status }}">
+                <h2>{{ result.title }}</h2>
+                
+                {% if result.status == 'danger' %}
+                    <p class="reason">{{ result.msg }}</p>
+                    <p class="math-note">⚠ {{ result.note }}</p>
+                {% else %}
+                    <div class="stats-grid">
+                        <div class="stat-box">
+                            <span class="label">Length</span>
+                            <span class="value">{{ result.length }}</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="label">Pool Size</span>
+                            <span class="value">{{ result.pool }}</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="label">Combinations</span>
+                            <span class="value">{{ result.combs }}</span>
+                        </div>
+                        <div class="stat-box highlight">
+                            <span class="label">Entropy</span>
+                            <span class="value">{{ result.entropy }}</span>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+        
+    </div>
+</div>
+
+</body>
+</html>
